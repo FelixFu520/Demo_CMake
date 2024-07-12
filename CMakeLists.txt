@@ -2,20 +2,68 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(demo VERSION 0.1.0 LANGUAGES C CXX)
 
 
-# 打印cmake配置信息
+# 打印cmake配置信息, cmake所有的配置信息都会被打印到文件中
 # $ cmake --system-information information.txt
 
 
-# 打印操作系统
-message(STATUS "Configuring on/for ${CMAKE_SYSTEM_NAME}")
+# 操作系统
+message(STATUS "FF, Configuring on/for ${CMAKE_SYSTEM_NAME}")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(STATUS "FF, Configuring on/for Linux")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    message(STATUS "FF, Configuring on/for macOS")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(STATUS "FF, Configuring on/for Windows")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "AIX")
+    message(STATUS "FF, Configuring on/for IBM AIX")
+else()
+    message(STATUS "FF, Configuring on/for ${CMAKE_SYSTEM_NAME}")
+endif()
 
+
+# 构建类型
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+message(STATUS "FF, Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "FF, C flags, Debug configuration: ${CMAKE_C_FLAGS_DEBUG}")
+message(STATUS "FF, C flags, Release configuration: ${CMAKE_C_FLAGS_RELEASE}")
+message(STATUS "FF, C flags, Release configuration with Debug info: ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+message(STATUS "FF, C flags, minimal Release configuration: ${CMAKE_C_FLAGS_MINSIZEREL}")
+message(STATUS "FF, C++ flags, Debug configuration: ${CMAKE_CXX_FLAGS_DEBUG}")
+message(STATUS "FF, C++ flags, Release configuration: ${CMAKE_CXX_FLAGS_RELEASE}")
+message(STATUS "FF, C++ flags, Release configuration with Debug info: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+message(STATUS "FF, C++ flags, minimal Release configuration: ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+
+
+# 设置编译器选项, 配合target_compile_options使用
+set(COMPILER_FLAGS)
+set(COMPILER_FLAGS_DEBUG)
+set(COMPILER_FLAGS_RELEASE)
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+  list(APPEND CXX_FLAGS "-fno-rtti" "-fno-exceptions")
+  list(APPEND CXX_FLAGS_DEBUG "-Wsuggest-final-types" "-Wsuggest-final-methods" "-Wsuggest-override")
+  list(APPEND CXX_FLAGS_RELEASE "-O3" "-Wno-unused")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+  list(APPEND CXX_FLAGS "-fno-rtti" "-fno-exceptions" "-Qunused-arguments" "-fcolor-diagnostics")
+  list(APPEND CXX_FLAGS_DEBUG "-Wdocumentation")
+  list(APPEND CXX_FLAGS_RELEASE "-O3" "-Wno-unused")
+endif()
+
+
+# 设置C++标准
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+message(STATUS "FF, C++ standard: ${CMAKE_CXX_STANDARD}")
 
 
 # 编译选项
 include(CMakeDependentOption)
 option(USE_LIBRARY "Compile sources into a library" OFF)
-message(STATUS "Compile sources into a library? ${USE_LIBRARY}")
-
+message(STATUS "FF, Compile sources into a library? ${USE_LIBRARY}")
 # second option depends on the value of the first
 cmake_dependent_option(
   MAKE_STATIC_LIBRARY "Compile sources into a static library" OFF
@@ -26,17 +74,30 @@ cmake_dependent_option(
 cmake_dependent_option(
   MAKE_SHARED_LIBRARY "Compile sources into a shared library" ON
   "USE_LIBRARY" ON
-  )
-
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+)
 
 
-# 生成库
+# 设置源文件
 list(APPEND _sources Message.hpp Message.cpp)
 
+
+# 设置源文件属性
+message(STATUS "FF, Setting source properties using IN LISTS syntax:")
+foreach(__source IN LISTS _sources)
+  set_source_files_properties(${__source} PROPERTIES COMPILE_FLAGS -O2)
+  message(STATUS "FF, Appending -O2 flag for ${__source}")
+endforeach()
+message(STATUS "FF, Querying sources properties using plain syntax:")
+foreach(__source ${_sources})
+  get_source_file_property(_flags ${__source} COMPILE_FLAGS)
+  message(STATUS "FF, Source ${__source} has the following extra COMPILE_FLAGS: ${_flags}")
+endforeach()
+
+
+# 生成可执行文件
 if(USE_LIBRARY)
-  message(STATUS "Compile sources into a STATIC library? ${MAKE_STATIC_LIBRARY}")
-  message(STATUS "Compile sources into a SHARED library? ${MAKE_SHARED_LIBRARY}")
+  message(STATUS "FF, Compile sources into a STATIC library? ${MAKE_STATIC_LIBRARY}")
+  message(STATUS "FF, Compile sources into a SHARED library? ${MAKE_SHARED_LIBRARY}")
 
   if(MAKE_SHARED_LIBRARY)
     add_library(message SHARED ${_sources})
@@ -44,10 +105,14 @@ if(USE_LIBRARY)
     add_executable(demo main.cpp)
 
     target_link_libraries(demo message)
-  endif()
-
-  if(MAKE_STATIC_LIBRARY)
+  elseif(MAKE_STATIC_LIBRARY)
     add_library(message STATIC ${_sources})
+
+    add_executable(demo main.cpp)
+
+    target_link_libraries(demo message)
+  else()
+    add_library(message ${_sources})
 
     add_executable(demo main.cpp)
 
@@ -57,6 +122,13 @@ else()
   add_executable(demo main.cpp ${_sources})
 endif()
 
+# 设置编译选项
+target_compile_options(demo
+  PRIVATE
+  ${CXX_FLAGS}
+  "$<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}>"
+  "$<$<CONFIG:Release>:${CXX_FLAGS_RELEASE}>"
+)
 
 # 处理与平台相关的源代码
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -89,20 +161,20 @@ endif()
 # 检测处理器体系结构
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   target_compile_definitions(demo PUBLIC "IS_64_BIT_ARCH")
-  message(STATUS "Target is 64 bits")
+  message(STATUS "FF, Target is 64 bits")
 else()
   target_compile_definitions(demo PUBLIC "IS_32_BIT_ARCH")
-  message(STATUS "Target is 32 bits")
+  message(STATUS "FF, Target is 32 bits")
 endif()
 
 if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "i386")
-    message(STATUS "i386 architecture detected")
+    message(STATUS "FF, i386 architecture detected")
 elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "i686")
-    message(STATUS "i686 architecture detected")
+    message(STATUS "FF, i686 architecture detected")
 elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
-    message(STATUS "x86_64 architecture detected")
+    message(STATUS "FF, x86_64 architecture detected")
 else()
-    message(STATUS "host processor architecture is unknown")
+    message(STATUS "FF, host processor architecture is unknown")
 endif()
 target_compile_definitions(demo
   PUBLIC "ARCHITECTURE=${CMAKE_HOST_SYSTEM_PROCESSOR}"
