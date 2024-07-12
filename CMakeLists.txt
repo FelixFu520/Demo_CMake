@@ -77,6 +77,13 @@ cmake_dependent_option(
 )
 
 
+# 第三方库
+find_package(Eigen3 3.3 REQUIRED CONFIG)
+message(STATUS "FF, Eigen3 found: ${Eigen3_DIR}")
+message(STATUS "FF, Eigen3 version: ${Eigen3_VERSION}")
+message(STATUS "FF, Eigen3 include dirs: ${EIGEN3_INCLUDE_DIR}")
+
+
 # 设置源文件
 list(APPEND _sources Message.hpp Message.cpp)
 
@@ -104,19 +111,19 @@ if(USE_LIBRARY)
 
     add_executable(demo main.cpp)
 
-    target_link_libraries(demo message)
+    target_link_libraries(demo message Eigen3::Eigen)
   elseif(MAKE_STATIC_LIBRARY)
     add_library(message STATIC ${_sources})
 
     add_executable(demo main.cpp)
 
-    target_link_libraries(demo message)
+    target_link_libraries(demo message Eigen3::Eigen)
   else()
     add_library(message ${_sources})
 
     add_executable(demo main.cpp)
 
-    target_link_libraries(demo message)
+    target_link_libraries(demo message Eigen3::Eigen)
   endif()
 else()
   add_executable(demo main.cpp ${_sources})
