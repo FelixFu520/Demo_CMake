@@ -1,2 +1,5 @@
-# Demo_CMake
-cmake学习demo
+# CMake Demo
+```
+cmake -H. -Bout/build/
+cmake --build out/build
+```
