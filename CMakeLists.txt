@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
-project(demo VERSION 0.1.0 LANGUAGES C CXX)
+project(demo VERSION 0.1.0 LANGUAGES C CXX Fortran)
 
 
 # 打印cmake配置信息, cmake所有的配置信息都会被打印到文件中
@@ -233,6 +233,55 @@ target_sources(pure-embedding
       ${CMAKE_CURRENT_BINARY_DIR}/use_numpy.py
   )
 # ./pure-embedding use_numpy print_ones 2 3
+
+
+# 检测BLAS和LAPACK(3. 检测外部库和程序)
+# https://www.netlib.org/lapack/
+# https://blog.csdn.net/liang_baikai/article/details/125808997
+# 找到BLAS和LAPACK
+message(STATUS "FF, Searching for BLAS and LAPACK")
+# SET(BLAS_LIBRARIES  /usr/local/lib/)
+# SET(LAPACK_DIR /usr/local/lib/cmake/lapack-3.12.0/)
+include(FortranCInterface)
+FortranCInterface_VERIFY(CXX)
+FortranCInterface_HEADER(
+  fc_mangle.h
+  MACRO_NAMESPACE "FC_"
+  SYMBOLS DSCAL DGESV
+  )
+find_package(BLAS REQUIRED)
+find_package(LAPACK REQUIRED)
+message(STATUS "FF, BLAS libraries: ${BLAS_LIBRARIES}")
+message(STATUS "FF, LAPACK libraries: ${LAPACK_LIBRARIES}")
+# 添加一个库，其中包含BLAS和LAPACK包装器的源代码，并链接到LAPACK_LIBRARIES
+add_library(math "")
+target_sources(math
+  PRIVATE
+    CxxBLAS.cpp
+    CxxLAPACK.cpp
+)
+# 注意，目标的包含目录和链接库声明为PUBLIC，因此任何依赖于数学库的附加目标也将在其包含目录中。
+target_include_directories(math
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+target_link_libraries(math
+  PUBLIC
+      ${LAPACK_LIBRARIES}
+      ${BLAS_LIBRARIES}
+      gfortran
+)
+add_executable(linear-algebra "")
+target_sources(linear-algebra
+  PRIVATE
+      linear-algebra.cpp
+)
+target_link_libraries(linear-algebra
+  PRIVATE
+      math
+)
+# ./linear-algebra 1000
 
 
 # 处理与平台相关的源代码(2. 检测环境)
