@@ -77,6 +77,7 @@ cmake_dependent_option(
 )
 
 
+# --------------------------- main ---------------------------
 # 第三方库
 find_package(Eigen3 3.3 REQUIRED CONFIG)
 message(STATUS "FF, Eigen3 found: ${Eigen3_DIR}")
@@ -136,6 +137,7 @@ target_compile_options(demo
   "$<$<CONFIG:Debug>:${CXX_FLAGS_DEBUG}>"
   "$<$<CONFIG:Release>:${CXX_FLAGS_RELEASE}>"
 )
+# ----------------------------------------------
 
 
 # 检测python解析器(3. 检测外部库和程序)
@@ -301,6 +303,37 @@ cmake_print_properties(
         INTERFACE_LINK_LIBRARIES
     )
 # ./example-openmp 1000000000
+
+
+# 检测Eigen(3. 检测外部库和程序)
+find_package(OpenMP REQUIRED)
+find_package(Eigen3 3.3 REQUIRED CONFIG)
+if(TARGET Eigen3::Eigen)
+  message(STATUS "FF, Eigen3 v${EIGEN3_VERSION_STRING} found in ${EIGEN3_INCLUDE_DIR}")
+endif()
+add_executable(linear-algebra-eigen linear-algebra-eigen.cpp)
+find_package(BLAS)
+if(BLAS_FOUND)
+  message(STATUS "Eigen will use some subroutines from BLAS.")
+  message(STATUS "See: http://eigen.tuxfamily.org/dox-devel/TopicUsingBlasLapack.html")
+  target_compile_definitions(linear-algebra
+    PRIVATE
+        EIGEN_USE_BLAS
+    )
+  target_link_libraries(linear-algebra
+    PUBLIC
+        ${BLAS_LIBRARIES}
+    )
+else()
+    message(STATUS "BLAS not found. Using Eigen own functions")
+endif()
+target_link_libraries(linear-algebra-eigen
+  PUBLIC
+    Eigen3::Eigen
+    OpenMP::OpenMP_CXX
+  )
+
+
 
 
 # 处理与平台相关的源代码(2. 检测环境)
