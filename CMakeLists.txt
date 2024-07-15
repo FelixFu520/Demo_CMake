@@ -334,6 +334,15 @@ target_link_libraries(linear-algebra-eigen
   )
 
 
+# 检测Boost(3. 检测外部库和程序)
+# https://blog.csdn.net/qq_41854911/article/details/119454212 , 安装
+find_package(Boost 1.54 REQUIRED COMPONENTS filesystem)
+add_executable(path-info path-info.cpp)
+target_link_libraries(path-info
+  PUBLIC
+      Boost::filesystem
+)
+# ./path-info /root/work
 
 
 # 处理与平台相关的源代码(2. 检测环境)
