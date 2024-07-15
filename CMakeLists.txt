@@ -154,6 +154,7 @@ message(STATUS "FF, OUTPUT_VARIABLE is: ${_hello_world}")
 
 
 # 检测Python库(3. 检测外部库和程序)
+find_package(PythonInterp REQUIRED)
 find_package(PythonLibs REQUIRED)
 message(STATUS "FF, Python version: ${PYTHONLIBS_VERSION_STRING}")
 message(STATUS "FF, Python include dirs: ${PYTHON_INCLUDE_DIRS}")
@@ -167,6 +168,71 @@ target_link_libraries(hello-embedded-python
   PRIVATE
     ${PYTHON_LIBRARIES}
 )
+
+
+# 检测Python模块和包(3. 检测外部库和程序)
+find_package(PythonInterp REQUIRED)
+find_package(PythonLibs REQUIRED)
+# 正确打包的Python模块，指定安装位置和版本
+execute_process(
+  COMMAND
+      ${PYTHON_EXECUTABLE} "-c" "import re, numpy; print(re.compile('/__init__.py.*').sub('',numpy.__file__))"
+  RESULT_VARIABLE _numpy_status
+  OUTPUT_VARIABLE _numpy_location
+  ERROR_QUIET
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+# 如果找到NumPy，则_numpy_status变量为整数，否则为错误的字符串，而_numpy_location将包含NumPy模块的路径。
+# 如果找到NumPy，则将它的位置保存到一个名为NumPy的新变量中。
+# 注意，新变量被缓存，这意味着CMake创建了一个持久性变量，用户稍后可以修改该变量
+if(NOT _numpy_status)
+    set(NumPy ${_numpy_location} CACHE STRING "Location of NumPy")
+endif()
+# 下一步是检查模块的版本
+execute_process(
+  COMMAND
+      ${PYTHON_EXECUTABLE} "-c" "import numpy; print(numpy.__version__)"
+  OUTPUT_VARIABLE _numpy_version
+  ERROR_QUIET
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+# FindPackageHandleStandardArgs的CMake包以正确的格式设置NumPy_FOUND变量和输出信息
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(NumPy
+  FOUND_VAR NumPy_FOUND
+  REQUIRED_VARS NumPy
+  VERSION_VAR _numpy_version
+)
+# 一旦正确的找到所有依赖项，我们就可以编译可执行文件，并将其链接到Python库
+add_executable(pure-embedding "")
+target_sources(pure-embedding
+  PRIVATE
+      Py${PYTHON_VERSION_MAJOR}-pure-embedding.cpp
+  )
+target_include_directories(pure-embedding
+  PRIVATE
+      ${PYTHON_INCLUDE_DIRS}
+  )
+target_link_libraries(pure-embedding
+  PRIVATE
+      ${PYTHON_LIBRARIES}
+  )
+# 我们还必须保证use_numpy.py在build目录中可用
+add_custom_command(
+  OUTPUT
+      ${CMAKE_CURRENT_BINARY_DIR}/use_numpy.py
+  COMMAND
+      ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/use_numpy.py
+      ${CMAKE_CURRENT_BINARY_DIR}/use_numpy.py
+  DEPENDS
+      ${CMAKE_CURRENT_SOURCE_DIR}/use_numpy.py
+  )
+# make sure building pure-embedding triggers the above custom command
+target_sources(pure-embedding
+  PRIVATE
+      ${CMAKE_CURRENT_BINARY_DIR}/use_numpy.py
+  )
+# ./pure-embedding use_numpy print_ones 2 3
 
 
 # 处理与平台相关的源代码(2. 检测环境)
