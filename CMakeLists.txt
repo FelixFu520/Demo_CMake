@@ -284,6 +284,25 @@ target_link_libraries(linear-algebra
 # ./linear-algebra 1000
 
 
+# 检测OpenMP(3. 检测外部库和程序)
+find_package(OpenMP REQUIRED)
+add_executable(example-openmp example.cpp)
+target_link_libraries(example-openmp
+  PUBLIC
+      OpenMP::OpenMP_CXX
+)
+include(CMakePrintHelpers)
+cmake_print_properties(
+    TARGETS
+        OpenMP::OpenMP_CXX
+    PROPERTIES
+        INTERFACE_COMPILE_OPTIONS
+        INTERFACE_INCLUDE_DIRECTORIES
+        INTERFACE_LINK_LIBRARIES
+    )
+# ./example-openmp 1000000000
+
+
 # 处理与平台相关的源代码(2. 检测环境)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_compile_definitions(demo PUBLIC "IS_LINUX")
