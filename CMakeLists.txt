@@ -6,7 +6,7 @@ project(demo VERSION 0.1.0 LANGUAGES C CXX)
 # $ cmake --system-information information.txt
 
 
-# 操作系统
+# 操作系统(2. 检测环境)
 message(STATUS "FF, Configuring on/for ${CMAKE_SYSTEM_NAME}")
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "FF, Configuring on/for Linux")
@@ -137,7 +137,39 @@ target_compile_options(demo
   "$<$<CONFIG:Release>:${CXX_FLAGS_RELEASE}>"
 )
 
-# 处理与平台相关的源代码
+
+# 检测python解析器(3. 检测外部库和程序)
+find_package(PythonInterp REQUIRED)
+message(STATUS "FF, Python interpreter found: ${PYTHON_EXECUTABLE}")
+execute_process(
+  COMMAND
+      ${PYTHON_EXECUTABLE} "-c" "print('Hello, world!')"
+  RESULT_VARIABLE _status
+  OUTPUT_VARIABLE _hello_world
+  ERROR_QUIET
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+message(STATUS "FF, RESULT_VARIABLE is: ${_status}")
+message(STATUS "FF, OUTPUT_VARIABLE is: ${_hello_world}")
+
+
+# 检测Python库(3. 检测外部库和程序)
+find_package(PythonLibs REQUIRED)
+message(STATUS "FF, Python version: ${PYTHONLIBS_VERSION_STRING}")
+message(STATUS "FF, Python include dirs: ${PYTHON_INCLUDE_DIRS}")
+message(STATUS "FF, Python libraries: ${PYTHON_LIBRARIES}")
+add_executable(hello-embedded-python hello-embedded-python.c)
+target_include_directories(hello-embedded-python
+  PRIVATE
+    ${PYTHON_INCLUDE_DIRS}
+)
+target_link_libraries(hello-embedded-python
+  PRIVATE
+    ${PYTHON_LIBRARIES}
+)
+
+
+# 处理与平台相关的源代码(2. 检测环境)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_compile_definitions(demo PUBLIC "IS_LINUX")
 endif()
@@ -149,7 +181,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 
-# 处理与编译器相关的源代码
+# 处理与编译器相关的源代码(2. 检测环境)
 target_compile_definitions(demo PUBLIC "COMPILER_NAME=\"${CMAKE_CXX_COMPILER_ID}\"")
 if(CMAKE_CXX_COMPILER_ID MATCHES Intel)
   target_compile_definitions(demo PUBLIC "IS_INTEL_CXX_COMPILER")
@@ -165,7 +197,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES XL)
 endif()
 
 
-# 检测处理器体系结构
+# 检测处理器体系结构(2. 检测环境)
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   target_compile_definitions(demo PUBLIC "IS_64_BIT_ARCH")
   message(STATUS "FF, Target is 64 bits")
@@ -185,10 +217,10 @@ else()
 endif()
 target_compile_definitions(demo
   PUBLIC "ARCHITECTURE=${CMAKE_HOST_SYSTEM_PROCESSOR}"
-  )
+)
 
 
-# 检测处理器指令集
+# 检测处理器指令集(2. 检测环境)
 target_include_directories(demo
   PRIVATE
        ${PROJECT_BINARY_DIR}
