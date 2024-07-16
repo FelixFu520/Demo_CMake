@@ -479,6 +479,22 @@ add_test(
 )
 
 
+# 使用Google Test测试框架(4. 创建和运行测试)
+# 安装Google Test: 自己找教程
+find_package(GTest REQUIRED)
+add_executable(cpp_test3 sum_integs_test3.cpp)
+target_link_libraries(cpp_test3
+  PUBLIC
+  GTest::GTest
+  GTest::Main
+  sum_integers
+)
+add_test(
+  NAME gtest_test
+  COMMAND $<TARGET_FILE:cpp_test3>
+)
+
+
 
 # ctest
 # include(CTest)
