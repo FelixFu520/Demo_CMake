@@ -510,6 +510,22 @@ add_test(
 )
 
 
+# 使用动态分析工具来检测内存缺陷(4. 创建和运行测试)
+# https://senlinzhan.github.io/2017/12/31/valgrind/, valgrind安装, 使用
+add_library(example_library leaky_implementation.cpp)
+add_executable(cpp_test_leaky leaky_implementation_main.cpp)
+target_link_libraries(cpp_test_leaky example_library)
+find_program(MEMORYCHECK_COMMAND NAMES valgrind)  # 查找valgrind，并将MEMORYCHECK_COMMAND设置为其绝对路径
+set(MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes --leak-check=full")
+# add memcheck test action
+include(CTest)
+enable_testing()
+add_test(
+  NAME cpp_test_leaky_memcheck
+  COMMAND $<TARGET_FILE:cpp_test_leaky>
+  )
+# ctest
+# ctest -T memcheck
 
 
 # ctest
