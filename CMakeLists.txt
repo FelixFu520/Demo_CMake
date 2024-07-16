@@ -462,6 +462,24 @@ add_test(
   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/sum_integs_test.py --short --executable $<TARGET_FILE:sum_up>
   )
 # ./sum_up 1 2 3 4 5
+
+
+# 使用Catch2测试框架(4. 创建和运行测试) 
+# 安装Catch2: 自己找教程
+find_package(Catch2 REQUIRED)
+add_executable(cpp_test2 sum_integs_test2.cpp)
+target_link_libraries(cpp_test2
+  PUBLIC
+  Catch2::Catch2 
+  sum_integers 
+)
+add_test(
+  NAME catch_test
+  COMMAND $<TARGET_FILE:cpp_test2> --success
+)
+
+
+
 # ctest
 # include(CTest)
 # enable_testing()
