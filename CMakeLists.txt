@@ -540,6 +540,28 @@ add_test(example_test_timeout ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/t
 set_tests_properties(example_test_timeout PROPERTIES TIMEOUT 10)
 
 
+# 并行测试(4. 创建和运行测试)
+find_package(PythonInterp REQUIRED)
+add_test(a ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/a.py)
+add_test(b ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/b.py)
+add_test(c ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/c.py)
+add_test(d ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/d.py)
+set_tests_properties(a b c d PROPERTIES COST 0.5)
+
+add_test(e ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/e.py)
+add_test(f ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/f.py)
+set_tests_properties(e f PROPERTIES COST 1.5)
+
+add_test(g ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/g.py)
+set_tests_properties(g PROPERTIES COST 2.5)
+
+add_test(h ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/h.py)
+set_tests_properties(h PROPERTIES COST 3.5)
+# ctest
+# ctest --parallel 4
+
+
+
 # ctest
 # include(CTest)
 # enable_testing()
