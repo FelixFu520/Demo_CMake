@@ -534,6 +534,11 @@ add_test(example_test_fail ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test
 set_tests_properties(example_test_fail PROPERTIES WILL_FAIL TRUE)
 
 
+# 使用超时测试运行时间长得测试(4. 创建和运行测试)
+find_package(PythonInterp REQUIRED)
+add_test(example_test_timeout ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_timeout.py)
+set_tests_properties(example_test_timeout PROPERTIES TIMEOUT 10)
+
 
 # ctest
 # include(CTest)
