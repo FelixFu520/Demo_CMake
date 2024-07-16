@@ -528,6 +528,13 @@ add_test(
 # ctest -T memcheck
 
 
+# 预期测试失败(4. 创建和运行测试)
+find_package(PythonInterp REQUIRED)
+add_test(example_test_fail ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_fail.py)
+set_tests_properties(example_test_fail PROPERTIES WILL_FAIL TRUE)
+
+
+
 # ctest
 # include(CTest)
 # enable_testing()
