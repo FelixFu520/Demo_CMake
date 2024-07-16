@@ -606,6 +606,42 @@ set_tests_properties(
 # ctest -I 2,4
 
     
+# 使用测试固件(4. 创建和运行测试)
+add_test(
+  NAME setup
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/setup.py
+)
+set_tests_properties(
+  setup
+  PROPERTIES
+      FIXTURES_SETUP my-fixture
+)
+add_test(
+  NAME feature-aa
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/feature-a.py
+  )
+add_test(
+  NAME feature-bb
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/feature-b.py
+  )
+set_tests_properties(
+  feature-aa
+  feature-bb
+  PROPERTIES
+      FIXTURES_REQUIRED my-fixture
+  )
+add_test(
+  NAME cleanup
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/cleanup.py
+  )
+set_tests_properties(
+  cleanup
+  PROPERTIES
+      FIXTURES_CLEANUP my-fixture
+  )
+# ctest -R feature-a
+
+
 
 # ctest
 # include(CTest)
