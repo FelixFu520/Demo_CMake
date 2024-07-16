@@ -495,6 +495,22 @@ add_test(
 )
 
 
+# 使用Boost.Test测试框架(4. 创建和运行测试)
+# 安装Boost: 自己找教程
+find_package(Boost 1.54 REQUIRED COMPONENTS unit_test_framework)
+add_executable(cpp_test4 sum_integs_test4.cpp)
+target_link_libraries(cpp_test4
+  PUBLIC
+  Boost::unit_test_framework
+  sum_integers
+)
+add_test(
+  NAME boost_test
+  COMMAND $<TARGET_FILE:cpp_test4>
+)
+
+
+
 
 # ctest
 # include(CTest)
