@@ -431,10 +431,41 @@ endforeach()
 configure_file(config.h.in config.h @ONLY)
 
 
-# 测试
-include(CTest)
+# 创建一个简单得测试单元(4. 创建和运行测试)
+find_package(PythonInterp REQUIRED)
+find_program(BASH_EXECUTABLE NAMES bash REQUIRED)
+# example library
+add_library(sum_integers sum_integers.cpp)
+# main code
+add_executable(sum_up sum_integs_main.cpp)
+target_link_libraries(sum_up sum_integers)
+# testing binary
+add_executable(cpp_test sum_integs_test.cpp)
+target_link_libraries(cpp_test sum_integers)
 enable_testing()
+message(STATUS "FF, CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "FF, BASH_EXECUTABLE: ${BASH_EXECUTABLE}")
+add_test(
+  NAME bash_test
+  COMMAND ${BASH_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test.sh $<TARGET_FILE:sum_up>
+  ) # 这个测试在vscode中无法运行, 但是在终端中可以运行
+add_test(
+  NAME cpp_test
+  COMMAND $<TARGET_FILE:cpp_test>
+  )
+add_test(
+  NAME python_test_long
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/sum_integs_test.py --executable $<TARGET_FILE:sum_up>
+  )
+add_test(
+  NAME python_test_short
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/sum_integs_test.py --short --executable $<TARGET_FILE:sum_up>
+  )
+# ./sum_up 1 2 3 4 5
+# ctest
+# include(CTest)
+# enable_testing()
 
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
+# set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+# set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+# include(CPack)

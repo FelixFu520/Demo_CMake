@@ -2,6 +2,7 @@
 out
 cmake-cookbook
 .vscode
+build
 
 # Prerequisites
 *.d
