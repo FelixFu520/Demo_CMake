@@ -48,13 +48,6 @@ set_compiler_flag(
 message(STATUS "FF, working CXX compile flag: ${working_compile_flag}")
 
 
-# 重新定义函数和宏 
-# (re)defines include_guard
-include(include_guard)
-# this is some custom module
-include(custom)
-# we simulate that we accidentally include the module a second time
-include(custom)
 
 
 # 设置安装目录
@@ -68,10 +61,13 @@ message(STATUS "FF, CMAKE_LIBRARY_OUTPUT_DIRECTORY: ${CMAKE_LIBRARY_OUTPUT_DIREC
 message(STATUS "FF, CMAKE_RUNTIME_OUTPUT_DIRECTORY: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 
-# 添加src目录
-add_subdirectory(src)   
+# defines targets and sources
+add_subdirectory(src)
 
+# contains an "external" library we will link to
+add_subdirectory(external)
 
-# 测试
-enable_testing()    # 启用测试
-add_subdirectory(tests) # 添加tests目录
+# enable testing and define tests
+enable_testing()
+add_subdirectory(tests)
+
