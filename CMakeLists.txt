@@ -38,7 +38,6 @@ set_compiler_flag(
   "-Minform=inform"  # this should work with PGI
   "-nope"            # this should fail
   )
-
 message(STATUS "FF, working C compile flag: ${working_compile_flag}")
 set_compiler_flag(
   working_compile_flag CXX REQUIRED
@@ -46,8 +45,8 @@ set_compiler_flag(
   "-g"      # this should work with GNU, Intel, PGI
   "/RTCcsu" # this should work with MSVC
   )
-
 message(STATUS "FF, working CXX compile flag: ${working_compile_flag}")
+
 
 # 设置安装目录
 include(GNUInstallDirs) 
