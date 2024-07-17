@@ -45,7 +45,7 @@ function(set_compiler_flag _result _lang)
     elseif(_lang STREQUAL "Fortran")
       check_Fortran_compiler_flag("${flag}" _flag_works)
     else()
-      message(FATAL_ERROR "Unknown language in set_compiler_flag: ${_lang}")
+      message(FATAL_ERROR "FF, Unknown language in set_compiler_flag: ${_lang}")
     endif()
 
     # if the flag works, use it, and exit
@@ -59,6 +59,6 @@ function(set_compiler_flag _result _lang)
 
   # raise an error if no flag was found
   if(_flag_is_required AND NOT _flag_found)
-    message(FATAL_ERROR "None of the required flags were supported")
+    message(FATAL_ERROR "FF, None of the required flags were supported")
   endif()
 endfunction()

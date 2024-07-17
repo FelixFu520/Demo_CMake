@@ -48,6 +48,15 @@ set_compiler_flag(
 message(STATUS "FF, working CXX compile flag: ${working_compile_flag}")
 
 
+# 重新定义函数和宏 
+# (re)defines include_guard
+include(include_guard)
+# this is some custom module
+include(custom)
+# we simulate that we accidentally include the module a second time
+include(custom)
+
+
 # 设置安装目录
 include(GNUInstallDirs) 
 message(STATUS "FF, GNUInstallDirs: ${GNUInstallDirs}")
