@@ -18,6 +18,7 @@ FortranCInterface_HEADER(
   SYMBOLS DSCAL DGESV
   )
 
+# https://blog.csdn.net/liang_baikai/article/details/125808997
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 
