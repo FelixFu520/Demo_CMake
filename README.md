@@ -84,8 +84,8 @@
 - 9.1 使用C/C++库构建Fortran项目
 - 9.2 使用Fortran库构建C/C++项目
 - 9.3 使用Cython构建C++和Python项目
-- 9.4 使用Boost Python构建C++和Python项目
-- 9.5 使用pybind11构建C++和Python项目
+- 9.4 使用Boost Python构建C++和Python项目(没通过)
+- 9.5 使用pybind11构建C++和Python项目(没通过)
 - 9.6 使用Python CFFI混合C, C++, Fortran和Python
 
 10. 编写安装程序
@@ -126,3 +126,38 @@
 - 15.6 移植安装目标
 - 15.7 进一步迁移的措施
 - 15.8 项目转换为CMake的常见问题
+
+## 语法学习
+- [add_executable](https://blog.csdn.net/MacKendy/article/details/122549819)
+- [add_library](https://blog.csdn.net/LaineGates/article/details/108242803)
+
+- [set_source_files_properties]()
+- [set_target_properties](https://blog.csdn.net/fengbingchun/article/details/128258041)
+- [set](https://blog.csdn.net/sinat_31608641/article/details/123101969)
+
+- [message](https://blog.csdn.net/Zhanganliu/article/details/99850603)
+- [option](https://blog.csdn.net/lhl_blog/article/details/123553686)
+
+- [cmake_dependent_option](https://blog.csdn.net/sinat_31608641/article/details/124656282)
+- [cmake_host_system_information](https://blog.csdn.net/fengbingchun/article/details/129108910)
+
+
+- [get_source_file_property]()
+
+- [target_compile_options](https://blog.csdn.net/sinat_31608641/article/details/125417042)
+- [target_compile_definitions](https://blog.csdn.net/fengbingchun/article/details/128273937)
+- [target_sources](https://blog.csdn.net/guaaaaaaa/article/details/125601766)
+- [target_include_directories]()
+
+- [configure_file](https://blog.csdn.net/qq_38410730/article/details/103741579)
+
+- [include_directories]()
+
+- [include]()
+- [check_cxx_compiler_flag]()
+
+- [find_file]()
+- [find_library]()
+- [find_package](https://blog.csdn.net/zhanghm1995/article/details/105466372)
+- [find_path]()
+- [find_program]()
