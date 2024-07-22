@@ -19,3 +19,6 @@ if(CMAKE_C_COMPILER_LOADED)
 endif()
 
 # cmake --system-information information.txt
+# 指定编译器
+# cmake -D CMAKE_CXX_COMPILER=g++ ..
+# cmake -D CMAKE_CXX_COMPILER=gcc ..
