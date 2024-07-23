@@ -51,3 +51,8 @@ enable_testing()
 add_subdirectory(tests)
 
 include(CMakeCPack.cmake)
+
+# cmake ..
+# cmake --build . --target help
+# cmake --build . --target package_source
+# cmake --build . --target package message-1.0.0-Linux.deb
